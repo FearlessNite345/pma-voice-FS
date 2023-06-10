@@ -164,11 +164,23 @@ RegisterCommand('+radiotalk', function()
 			radioPressed = true
 			playMicClicks(true)
 			if GetConvarInt('voice_enableRadioAnim', 0) == 1 and not (GetConvarInt('voice_disableVehicleRadioAnim', 0) == 1 and IsPedInAnyVehicle(PlayerPedId(), false)) and not disableRadioAnim then
-				RequestAnimDict('random@arrests')
-				while not HasAnimDictLoaded('random@arrests') do
-					Wait(10)
+				RequestAnimDict('anim@male@holding_radio')
+				while not HasAnimDictLoaded('anim@male@holding_radio') do
+					Citizen.Wait(10)
 				end
-				TaskPlayAnim(PlayerPedId(), "random@arrests", "generic_radio_enter", 8.0, 2.0, -1, 50, 2.0, false, false, false)
+				TaskPlayAnim(PlayerPedId(), "anim@male@holding_radio", "holding_radio_clip", 8.0, 2.0, -1, 50, 2.0, 0, 0, 0)
+				local model = `prop_cs_hand_radio`
+				requestModel(model --[[@as number]])
+				radioProp = CreateObject(model, 0.0, 0.0, 0.0, true, true, true)
+				local ped = PlayerPedId()
+				AttachEntityToEntity(radioProp, ped, GetPedBoneIndex(ped, 28422),  
+					0.0750,
+					0.0230,
+					-0.0230,
+					-90.0000,
+					0.0,
+					-59.9999, true, true, false, true, 0, true)
+				SetModelAsNoLongerNeeded(model)
 			end
 			CreateThread(function()
 				TriggerEvent("pma-voice:radioActive", true)
@@ -209,3 +221,18 @@ function syncRadio(_radioChannel)
 	radioChannel = _radioChannel
 end
 RegisterNetEvent('pma-voice:clSetPlayerRadio', syncRadio)
+
+function removeRadioProp()
+	if not radioProp then return end
+	DetachEntity(radioProp, false, false)
+	DeleteEntity(radioProp)
+	radioProp = nil
+end
+
+function requestModel(model)
+	if HasModelLoaded(model) then return end
+	RequestModel(model)
+	while not HasModelLoaded(model) do
+		Wait(0)
+	end
+end
