@@ -152,6 +152,8 @@ function isDead()
 	end
 end
 
+local radioProp = nil
+
 RegisterCommand('+radiotalk', function()
 	if GetConvarInt('voice_enableRadios', 1) ~= 1 then return end
 	if isDead() or LocalPlayer.state.disableRadio then return end
@@ -203,7 +205,8 @@ RegisterCommand('-radiotalk', function()
 		TriggerEvent("pma-voice:radioActive", false)
 		playMicClicks(false)
 		if GetConvarInt('voice_enableRadioAnim', 0) == 1 then
-			StopAnimTask(PlayerPedId(), "random@arrests", "generic_radio_enter", -4.0)
+			StopAnimTask(PlayerPedId(), "anim@male@holding_radio", "holding_radio_clip", -4.0)
+			removeRadioProp()
 		end
 		TriggerServerEvent('pma-voice:setTalkingOnRadio', false)
 	end
